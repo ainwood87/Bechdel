@@ -26,8 +26,8 @@ import java.io.IOException;
 
 
 public class MainActivity extends ActionBarActivity {
+    private static final String queryString = "http://bechdeltest.com/api/v1/getMoviesByTitle?title=";
     class RequestTask extends AsyncTask<String, String, String> {
-
         @Override
         protected String doInBackground(String... uri) {
             HttpClient httpclient = new DefaultHttpClient();
@@ -65,22 +65,20 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         handleIntent(getIntent());
-
-        new RequestTask().execute("http://bechdeltest.com/api/v1/getMoviesByTitle?title=matrix");
     }
 
     @Override
     protected void onNewIntent(Intent intent)
     {
-        handleIntent(getIntent());
+        handleIntent(intent);
     }
 
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             //use the query to search your data somehow
+            new RequestTask().execute(queryString + query);
         }
     }
     @Override
