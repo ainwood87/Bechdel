@@ -11,6 +11,6 @@ public class MovieHolder extends RecyclerView.ViewHolder {
     public TextView textView;
     public MovieHolder(View view) {
         super (view);
-        textView = (TextView) view.findViewById(R.id.movieText);
+//        textView = (TextView) view.findViewById(R.id.movieText);
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="horizontal">
     <ImageView
@@ -8,35 +8,34 @@
         android:adjustViewBounds="true"
         android:id="@+id/posterView"
         android:src="@drawable/unknown"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Test"
-        android:id="@+id/movieText"
+        android:layout_alignParentLeft="true"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/titleView"
         android:text="A Movie"
+        android:layout_toRightOf="@+id/posterView"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/scoreView"
         android:text="0"
-        />
+        android:layout_toLeftOf="@+id/denominator"
+        android:layout_centerVertical="true" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/denominator"
         android:text="/3"
-        />
+        android:layout_toLeftOf="@+id/scorePic"
+        android:layout_centerVertical="true" />
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/scorePic"
         android:src="@drawable/score0"
-        />
-</LinearLayout>
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true" />
+</RelativeLayout>
