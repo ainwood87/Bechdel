@@ -84,8 +84,6 @@ public class MainActivity extends ActionBarActivity {
         recList.setLayoutManager(llm);
 
         MovieViewAdapter adapter = new MovieViewAdapter();
-        adapter.addData("Hellow");
-        adapter.addData("Werld");
         recList.setAdapter(adapter);
         setContentView(view);
     }

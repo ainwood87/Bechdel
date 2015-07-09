@@ -29,6 +29,8 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
     public void onBindViewHolder(MovieHolder holder, int position) {
         MovieInfo info = movieList.get(position);
 //        holder.textView.setText(info.getText());
+        holder.scoreView.setText(info.getScore());
+        holder.titleView.setText(info.getTitle());
     }
 
     @Override
@@ -36,9 +38,7 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
         return movieList.size();
     }
 
-    public void addData(String text) {
-        MovieInfo info = new MovieInfo();
-        info.setText(text);
+    public void addData(MovieInfo info) {
         movieList.add(info);
         notifyDataSetChanged();
     }
