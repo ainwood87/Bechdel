@@ -8,10 +8,15 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -23,10 +28,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 
 public class MainActivity extends ActionBarActivity {
     private static final String queryString = "http://bechdeltest.com/api/v1/getMoviesByTitle?title=";
+    private TextView resultView;
+    RecyclerView recList;
     class RequestTask extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... uri) {
@@ -59,13 +67,27 @@ public class MainActivity extends ActionBarActivity {
             super.onPostExecute(result);
             //Do anything with response..
             System.out.println("Got result: " + result);
+            resultView.setText(result);
         }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layouut.activity_main);
         handleIntent(getIntent());
+        LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.activity_main, null);
+        resultView = (TextView) view.findViewById(R.id.resultView);
+        recList = (RecyclerView) view.findViewById(R.id.cardList);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recList.setLayoutManager(llm);
+
+        MovieViewAdapter adapter = new MovieViewAdapter();
+        adapter.addData("Hellow");
+        adapter.addData("Werld");
+        recList.setAdapter(adapter);
+        setContentView(view);
     }
 
     @Override
@@ -78,7 +100,13 @@ public class MainActivity extends ActionBarActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             //use the query to search your data somehow
-            new RequestTask().execute(queryString + query);
+            String str = "";
+            try {
+                str = URLEncoder.encode(query, "utf-8");
+            } catch (Exception e) {
+
+            }
+            new RequestTask().execute(queryString + str);
         }
     }
     @Override
