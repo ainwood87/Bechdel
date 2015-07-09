@@ -29,7 +29,7 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
     public void onBindViewHolder(MovieHolder holder, int position) {
         MovieInfo info = movieList.get(position);
 //        holder.textView.setText(info.getText());
-        holder.scoreView.setText(info.getScore());
+        holder.scoreView.setText(Integer.toString(info.getScore()));
         holder.titleView.setText(info.getTitle());
     }
 

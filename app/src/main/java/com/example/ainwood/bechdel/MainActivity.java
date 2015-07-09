@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -25,16 +24,22 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
     private static final String queryString = "http://bechdeltest.com/api/v1/getMoviesByTitle?title=";
-    private TextView resultView;
+//    private TextView resultView;
+    private MovieViewAdapter adapter;
     RecyclerView recList;
+    ArrayList<MovieInfo> movieInfoArrayList;
     class RequestTask extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... uri) {
@@ -59,6 +64,22 @@ public class MainActivity extends ActionBarActivity {
             } catch (IOException e) {
                 //TODO Handle problems..
             }
+            if (responseString != null) {
+                try {
+                    //parse the JSON data
+                    JSONArray json = new JSONArray(responseString);
+//                    JSONObject json = new JSONObject(responseString);
+                    for (int i = 0; i < json.length(); ++i) {
+                        JSONObject jsonObject = json.getJSONObject(i);
+                        MovieInfo info = new MovieInfo();
+                        info.setTitle(jsonObject.getString("title"));
+                        info.setScore(Integer.parseInt(jsonObject.getString("rating")));
+                        movieInfoArrayList.add(info);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
             return responseString;
         }
 
@@ -67,23 +88,27 @@ public class MainActivity extends ActionBarActivity {
             super.onPostExecute(result);
             //Do anything with response..
             System.out.println("Got result: " + result);
-            resultView.setText(result);
+//            resultView.setText(result);
+            for (MovieInfo info : movieInfoArrayList) {
+                adapter.addData(info);
+            }
         }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        movieInfoArrayList = new ArrayList<MovieInfo>();
 //        setContentView(R.layouut.activity_main);
         handleIntent(getIntent());
         LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.activity_main, null);
-        resultView = (TextView) view.findViewById(R.id.resultView);
+//        resultView = (TextView) view.findViewById(R.id.resultView);
         recList = (RecyclerView) view.findViewById(R.id.cardList);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
 
-        MovieViewAdapter adapter = new MovieViewAdapter();
+        adapter = new MovieViewAdapter();
         recList.setAdapter(adapter);
         setContentView(view);
     }
