@@ -1,6 +1,6 @@
 package com.example.ainwood.bechdel;
 
-import android.media.Image;
+import android.graphics.Bitmap;
 
 /**
  * Created by ainwo_000 on 7/8/2015.
@@ -22,11 +22,11 @@ public class MovieInfo {
         this.score = score;
     }
 
-    public Image getPoster() {
+    public Bitmap getPoster() {
         return poster;
     }
 
-    public void setPoster(Image poster) {
+    public void setPoster(Bitmap poster) {
         this.poster = poster;
     }
 
@@ -38,9 +38,20 @@ public class MovieInfo {
         this.imdbid = imdbid;
     }
 
+    MovieInfo() {
+        this.imdbid = 0;
+        title = "";
+        score = 0;
+    }
+    MovieInfo(MovieInfo other) {
+        this.imdbid = other.imdbid;
+        this.title = other.title;
+        this.score = other.score;
+        this.poster = other.poster;
+    }
     private long imdbid;
     private String title;
     private int score;
-    private Image poster;
+    private Bitmap poster;
 
 }

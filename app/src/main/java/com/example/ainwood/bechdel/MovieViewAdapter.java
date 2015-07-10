@@ -31,6 +31,7 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
 //        holder.textView.setText(info.getText());
         holder.scoreView.setText(Integer.toString(info.getScore()));
         holder.titleView.setText(info.getTitle());
+        holder.posterView.setImageBitmap(info.getPoster());
     }
 
     @Override
