@@ -79,12 +79,35 @@ public class MainActivity extends ActionBarActivity {
             final String bechdelString = queryString + str;
             ArrayList<MovieInfo> movieInfoArrayList = new ArrayList<MovieInfo>();
             new Thread(new Runnable() {
+                private String getPosterURL(String jsonString) {
+                    String posterURL = "";
+                    return posterURL;
+                }
                 private String getimdbResult(long imdbid) {
-                   HttpClient httpClient = new DefaultHttpClient();
+                    HttpClient httpclient = new DefaultHttpClient();
                     HttpResponse response;
                     String responseString = null;
-                    String query = "http://www.omdbapi.com/?i=tt" + imdbid;
 
+                    String query = "http://www.omdbapi.com/?i=tt" + imdbid + "&plot=short&r=json";
+                    System.out.println("IMDB QUERY " + query);
+                    try {
+                        response = httpclient.execute(new HttpGet(query));
+                        StatusLine statusLine = response.getStatusLine();
+                        if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            response.getEntity().writeTo(out);
+                            responseString = out.toString();
+                            out.close();
+                        } else{
+                            //Closes the connection.
+                            response.getEntity().getContent().close();
+                            throw new IOException(statusLine.getReasonPhrase());
+                        }
+                    } catch (ClientProtocolException e) {
+                        //TODO Handle problems..
+                    } catch (IOException e) {
+                        //TODO Handle problems..
+                    }
                     return responseString;
                 }
                 private Bitmap getPoster(String urldisplay) {
