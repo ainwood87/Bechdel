@@ -30,7 +30,17 @@ public class MovieInfo {
         this.poster = poster;
     }
 
+    public long getImdbid() {
+        return imdbid;
+    }
+
+    public void setImdbid(long imdbid) {
+        this.imdbid = imdbid;
+    }
+
+    private long imdbid;
     private String title;
     private int score;
     private Image poster;
+
 }

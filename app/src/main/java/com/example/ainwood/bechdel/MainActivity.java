@@ -5,17 +5,21 @@ import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -30,6 +34,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
@@ -74,6 +79,7 @@ public class MainActivity extends ActionBarActivity {
                         MovieInfo info = new MovieInfo();
                         info.setTitle(jsonObject.getString("title"));
                         info.setScore(Integer.parseInt(jsonObject.getString("rating")));
+                        info.setImdbid(Long.parseLong(jsonObject.getString("imdbid")));
                         movieInfoArrayList.add(info);
                     }
                 } catch (JSONException e) {
@@ -88,10 +94,80 @@ public class MainActivity extends ActionBarActivity {
             super.onPostExecute(result);
             //Do anything with response..
             System.out.println("Got result: " + result);
-//            resultView.setText(result);
+
+            //insert MovieInfo into list
             for (MovieInfo info : movieInfoArrayList) {
+                //TODO request OMDB info for each movie
+                new RequestOMDB().execute(info.getImdbid());
+                //TODO Download the bitmap from OMDB output and insert into View
                 adapter.addData(info);
             }
+        }
+    }
+
+    //TODO implement RequestOMDB. Mainly looking for poster URL
+    private class RequestOMDB extends AsyncTask<Long, String, String> {
+        @Override
+        protected String doInBackground(Long... imdbid) {
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpResponse response;
+            String responseString = null;
+//            StringBuilder sb = new StringBuilder();
+//            sb.append("http://www.omdbapi.com/?i=tt");
+//            sb.append(imdbid[0]);
+//            sb.append("&plot=short&r=json");
+//            String query = sb.toString();
+            String query = "http://www.omdbapi.com/?i=tt" + imdbid[0].toString() + "&plot=short&r=json";
+            System.out.println("IMDB QUERY " + query);
+            try {
+                response = httpclient.execute(new HttpGet(query));
+                StatusLine statusLine = response.getStatusLine();
+                if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    response.getEntity().writeTo(out);
+                    responseString = out.toString();
+                    out.close();
+                } else{
+                    //Closes the connection.
+                    response.getEntity().getContent().close();
+                    throw new IOException(statusLine.getReasonPhrase());
+                }
+            } catch (ClientProtocolException e) {
+                //TODO Handle problems..
+            } catch (IOException e) {
+                //TODO Handle problems..
+            }
+            return responseString;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            System.out.println("got imdb response: " + result);
+        }
+
+    }
+
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
         }
     }
     @Override
