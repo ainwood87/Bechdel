@@ -75,12 +75,19 @@ public class MainActivity extends ActionBarActivity {
             } catch (Exception e) {
 
             }
-
+            adapter.clearAllData();
             final String bechdelString = queryString + str;
             ArrayList<MovieInfo> movieInfoArrayList = new ArrayList<MovieInfo>();
             new Thread(new Runnable() {
                 private String getPosterURL(String jsonString) {
                     String posterURL = "";
+                    try {
+                        JSONObject json = new JSONObject(jsonString);
+                        posterURL = json.getString("Poster");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     return posterURL;
                 }
                 private String getimdbResult(long imdbid) {
@@ -88,7 +95,8 @@ public class MainActivity extends ActionBarActivity {
                     HttpResponse response;
                     String responseString = null;
 
-                    String query = "http://www.omdbapi.com/?i=tt" + imdbid + "&plot=short&r=json";
+                    String formatted = String.format("%07d", imdbid);
+                    String query = "http://www.omdbapi.com/?i=tt" + formatted + "&plot=short&r=json";
                     System.out.println("IMDB QUERY " + query);
                     try {
                         response = httpclient.execute(new HttpGet(query));
@@ -156,7 +164,10 @@ public class MainActivity extends ActionBarActivity {
                             info.setScore(Integer.parseInt(jsonObject.getString("rating")));
                             info.setImdbid(Long.parseLong(jsonObject.getString("imdbid")));
                             //get poster
-                            info.setPoster(getPoster(info.getImdbid()));
+                            System.out.println("Got imdb response: " + getimdbResult(info.getImdbid()));
+                            String posterURL = getPosterURL(getimdbResult(info.getImdbid()));
+                            System.out.println("got posterurl: " + posterURL);
+                            info.setPoster(getPoster(posterURL));
 //                            movieInfoArrayList.add(info);
                             final MovieInfo info2 = new MovieInfo(info);
                             runOnUiThread(new Runnable() {
