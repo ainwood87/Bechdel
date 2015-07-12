@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,12 +37,12 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-
 public class MainActivity extends ActionBarActivity {
     private static final String queryString = "http://bechdeltest.com/api/v1/getMoviesByTitle?title=";
     private MovieViewAdapter adapter;
     RecyclerView recList;
-
+    private Thread workThread;
+    boolean requestKill = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,111 +79,136 @@ public class MainActivity extends ActionBarActivity {
             adapter.clearAllData();
             final String bechdelString = queryString + str;
             ArrayList<MovieInfo> movieInfoArrayList = new ArrayList<MovieInfo>();
-            new Thread(new Runnable() {
-                private String getPosterURL(String jsonString) {
-                    String posterURL = "";
-                    try {
-                        JSONObject json = new JSONObject(jsonString);
-                        posterURL = json.getString("Poster");
+            if (workThread == null) {
+                setupThread(bechdelString);
+                workThread.start();
+            } else {
+                requestKill = true;
+                final Handler myHandler = new Handler();
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    return posterURL;
-                }
-                private String getimdbResult(long imdbid) {
-                    HttpClient httpclient = new DefaultHttpClient();
-                    HttpResponse response;
-                    String responseString = null;
-
-                    String formatted = String.format("%07d", imdbid);
-                    String query = "http://www.omdbapi.com/?i=tt" + formatted + "&plot=short&r=json";
-                    System.out.println("IMDB QUERY " + query);
-                    try {
-                        response = httpclient.execute(new HttpGet(query));
-                        StatusLine statusLine = response.getStatusLine();
-                        if(statusLine.getStatusCode() == HttpStatus.SC_OK){
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            response.getEntity().writeTo(out);
-                            responseString = out.toString();
-                            out.close();
-                        } else{
-                            //Closes the connection.
-                            response.getEntity().getContent().close();
-                            throw new IOException(statusLine.getReasonPhrase());
+                myHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (workThread.isAlive()) {
+                            myHandler.postDelayed(this, 100);
+                        } else {
+                            setupThread(bechdelString);
+                            workThread.start();
+                            requestKill = false;
                         }
-                    } catch (ClientProtocolException e) {
-                        //TODO Handle problems..
-                    } catch (IOException e) {
-                        //TODO Handle problems..
                     }
-                    return responseString;
-                }
-                private Bitmap getPoster(String urldisplay) {
-                    Bitmap mIcon11 = null;
-                    try {
-                        InputStream in = new java.net.URL(urldisplay).openStream();
-                        mIcon11 = BitmapFactory.decodeStream(in);
-                    } catch (Exception e) {
-                        Log.e("Error", e.getMessage());
-                        e.printStackTrace();
-                    }
-                    return mIcon11;
-                }
-                @Override
-                public void run() {
-                    HttpClient httpclient = new DefaultHttpClient();
-                    HttpResponse response;
-                    String responseString = null;
-                    try {
-                        response = httpclient.execute(new HttpGet(bechdelString));
-                        StatusLine statusLine = response.getStatusLine();
-                        if(statusLine.getStatusCode() == HttpStatus.SC_OK){
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            response.getEntity().writeTo(out);
-                            responseString = out.toString();
-                            out.close();
-                        } else{
-                            //Closes the connection.
-                            response.getEntity().getContent().close();
-                            throw new IOException(statusLine.getReasonPhrase());
-                        }
-                    } catch (ClientProtocolException e) {
-                        //TODO Handle problems..
-                    } catch (IOException e) {
-                        //TODO Handle problems..
-                    }
-                    if (null == responseString) return;
-                    try {
-                        //parse the JSON data
-                        JSONArray json = new JSONArray(responseString);
-//                    JSONObject json = new JSONObject(responseString);
-                        for (int i = 0; i < json.length(); ++i) {
-                            JSONObject jsonObject = json.getJSONObject(i);
-                            MovieInfo info = new MovieInfo();
-                            info.setTitle(jsonObject.getString("title"));
-                            info.setScore(Integer.parseInt(jsonObject.getString("rating")));
-                            info.setImdbid(Long.parseLong(jsonObject.getString("imdbid")));
-                            //get poster
-                            System.out.println("Got imdb response: " + getimdbResult(info.getImdbid()));
-                            String posterURL = getPosterURL(getimdbResult(info.getImdbid()));
-                            System.out.println("got posterurl: " + posterURL);
-                            info.setPoster(getPoster(posterURL));
-//                            movieInfoArrayList.add(info);
-                            final MovieInfo info2 = new MovieInfo(info);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    adapter.addData(info2);
-                                }
-                            });
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
+                }, 100);
+            }
         }
+    }
+    private void setupThread(final String bechdelString) {
+        workThread = new Thread(new Runnable() {
+            private String getPosterURL(String jsonString) {
+                String posterURL = "";
+                try {
+                    JSONObject json = new JSONObject(jsonString);
+                    posterURL = json.getString("Poster");
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return posterURL;
+            }
+            private String getimdbResult(long imdbid) {
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse response;
+                String responseString = null;
+
+                String formatted = String.format("%07d", imdbid);
+                String query = "http://www.omdbapi.com/?i=tt" + formatted + "&plot=short&r=json";
+                System.out.println("IMDB QUERY " + query);
+                try {
+                    response = httpclient.execute(new HttpGet(query));
+                    StatusLine statusLine = response.getStatusLine();
+                    if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        response.getEntity().writeTo(out);
+                        responseString = out.toString();
+                        out.close();
+                    } else{
+                        //Closes the connection.
+                        response.getEntity().getContent().close();
+                        throw new IOException(statusLine.getReasonPhrase());
+                    }
+                } catch (ClientProtocolException e) {
+                    //TODO Handle problems..
+                } catch (IOException e) {
+                    //TODO Handle problems..
+                }
+                return responseString;
+            }
+            private Bitmap getPoster(String urldisplay) {
+                Bitmap mIcon11 = null;
+                try {
+                    InputStream in = new java.net.URL(urldisplay).openStream();
+                    mIcon11 = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+                return mIcon11;
+            }
+            @Override
+            public void run() {
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse response;
+                String responseString = null;
+                try {
+                    response = httpclient.execute(new HttpGet(bechdelString));
+                    StatusLine statusLine = response.getStatusLine();
+                    if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        response.getEntity().writeTo(out);
+                        responseString = out.toString();
+                        out.close();
+                    } else{
+                        //Closes the connection.
+                        response.getEntity().getContent().close();
+                        throw new IOException(statusLine.getReasonPhrase());
+                    }
+                } catch (ClientProtocolException e) {
+                    //TODO Handle problems..
+                } catch (IOException e) {
+                    //TODO Handle problems..
+                }
+                if (null == responseString) return;
+                try {
+                    //parse the JSON data
+                    JSONArray json = new JSONArray(responseString);
+//                    JSONObject json = new JSONObject(responseString);
+                    for (int i = 0; i < json.length(); ++i) {
+                        JSONObject jsonObject = json.getJSONObject(i);
+                        MovieInfo info = new MovieInfo();
+                        info.setTitle(jsonObject.getString("title"));
+                        info.setScore(Integer.parseInt(jsonObject.getString("rating")));
+                        info.setImdbid(Long.parseLong(jsonObject.getString("imdbid")));
+                        //get poster
+                        System.out.println("Got imdb response: " + getimdbResult(info.getImdbid()));
+                        String posterURL = getPosterURL(getimdbResult(info.getImdbid()));
+                        System.out.println("got posterurl: " + posterURL);
+                        if (requestKill) return;
+                        info.setPoster(getPoster(posterURL));
+                        if (requestKill) return;
+
+//                            movieInfoArrayList.add(info);
+                        final MovieInfo info2 = new MovieInfo(info);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.addData(info2);
+                            }
+                        });
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
