@@ -56,6 +56,17 @@ public class QueryThread extends Thread {
         return posterURL;
     }
 
+    private String getYear(String jsonString) {
+        String year = "";
+        try {
+            JSONObject json = new JSONObject(jsonString);
+            year = json.getString("Year");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return year;
+    }
     private String getimdbResult(long imdbid) {
         HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
@@ -132,8 +143,10 @@ public class QueryThread extends Thread {
                 info.setScore(Integer.parseInt(jsonObject.getString("rating")));
                 info.setImdbid(Long.parseLong(jsonObject.getString("imdbid")));
                 //get poster
-                System.out.println("Got imdb response: " + getimdbResult(info.getImdbid()));
-                String posterURL = getPosterURL(getimdbResult(info.getImdbid()));
+                String imdbResult = getimdbResult(info.getImdbid());
+                info.setTitle(info.getTitle() + " (" + getYear(imdbResult) + ")");
+                System.out.println("Got imdb response: " + imdbResult);
+                String posterURL = getPosterURL(imdbResult);
                 System.out.println("got posterurl: " + posterURL);
                 if (requestKill) return;
                 info.setPoster(getPoster(posterURL));

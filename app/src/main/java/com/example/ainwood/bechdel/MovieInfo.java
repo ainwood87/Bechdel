@@ -38,20 +38,26 @@ public class MovieInfo {
         this.imdbid = imdbid;
     }
 
+    public String getYear() { return year; }
+
+    public void setYear(String year) { this.year = year; }
+
     MovieInfo() {
         this.imdbid = 0;
         title = "";
         score = 0;
+        year = "";
     }
     MovieInfo(MovieInfo other) {
         this.imdbid = other.imdbid;
         this.title = other.title;
         this.score = other.score;
         this.poster = other.poster;
+        this.year = other.year;
     }
     private long imdbid;
     private String title;
     private int score;
     private Bitmap poster;
-
+    private String year;
 }
