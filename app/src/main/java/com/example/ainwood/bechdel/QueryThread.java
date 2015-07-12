@@ -133,15 +133,24 @@ public class QueryThread extends Thread {
         }
         if (null == responseString) return;
         try {
+            System.out.println("got response: " + responseString);
             //parse the JSON data
             JSONArray json = new JSONArray(responseString);
 //                    JSONObject json = new JSONObject(responseString);
             for (int i = 0; i < json.length(); ++i) {
                 JSONObject jsonObject = json.getJSONObject(i);
                 MovieInfo info = new MovieInfo();
+                System.out.println("Going to set stuff: ");
                 info.setTitle(jsonObject.getString("title"));
-                info.setScore(Integer.parseInt(jsonObject.getString("rating")));
-                info.setImdbid(Long.parseLong(jsonObject.getString("imdbid")));
+                System.out.println("Title: " + info.getTitle());
+                String score = jsonObject.getString("rating");
+                String imdbid = jsonObject.getString("imdbid");
+                if (score != "null") {
+                    info.setScore(Integer.parseInt(score));
+                }
+                if (imdbid != "null") {
+                    info.setImdbid(Long.parseLong(imdbid));
+                }
                 //get poster
                 String imdbResult = getimdbResult(info.getImdbid());
                 info.setTitle(info.getTitle() + " (" + getYear(imdbResult) + ")");
