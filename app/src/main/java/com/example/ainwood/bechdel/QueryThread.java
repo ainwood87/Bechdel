@@ -26,6 +26,9 @@ import java.io.InputStream;
 public class QueryThread extends Thread {
     private String bechdelString;
     private Activity activity;
+    private String responseString;
+    int pagesize;
+    int page;
     MovieViewAdapter adapter;
     public boolean isRequestKill() {
         return requestKill;
@@ -37,10 +40,13 @@ public class QueryThread extends Thread {
 
     private boolean requestKill;
 
-    QueryThread(Activity activity, MovieViewAdapter adapter, String bechdelString) {
+    QueryThread(Activity activity, MovieViewAdapter adapter, String bechdelString, String responseString, int pagesize, int page) {
         this.bechdelString = bechdelString;
         this.adapter = adapter;
         this.activity = activity;
+        this.responseString = responseString;
+        this.page = page;
+        this.pagesize = pagesize;
         requestKill = false;
     }
 
@@ -112,24 +118,25 @@ public class QueryThread extends Thread {
     public void run() {
         HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
-        String responseString = null;
-        try {
-            response = httpclient.execute(new HttpGet(bechdelString));
-            StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                response.getEntity().writeTo(out);
-                responseString = out.toString();
-                out.close();
-            } else {
-                //Closes the connection.
-                response.getEntity().getContent().close();
-                throw new IOException(statusLine.getReasonPhrase());
+        if (null == responseString) {
+            try {
+                response = httpclient.execute(new HttpGet(bechdelString));
+                StatusLine statusLine = response.getStatusLine();
+                if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    response.getEntity().writeTo(out);
+                    responseString = out.toString();
+                    out.close();
+                } else {
+                    //Closes the connection.
+                    response.getEntity().getContent().close();
+                    throw new IOException(statusLine.getReasonPhrase());
+                }
+            } catch (ClientProtocolException e) {
+                //TODO Handle problems..
+            } catch (IOException e) {
+                //TODO Handle problems..
             }
-        } catch (ClientProtocolException e) {
-            //TODO Handle problems..
-        } catch (IOException e) {
-            //TODO Handle problems..
         }
         if (null == responseString) return;
         try {
@@ -137,7 +144,7 @@ public class QueryThread extends Thread {
             //parse the JSON data
             JSONArray json = new JSONArray(responseString);
 //                    JSONObject json = new JSONObject(responseString);
-            for (int i = 0; i < json.length(); ++i) {
+            for (int i = pagesize * page; i < json.length() && i < pagesize * (page + 1); ++i) {
                 JSONObject jsonObject = json.getJSONObject(i);
                 MovieInfo info = new MovieInfo();
                 System.out.println("Going to set stuff: ");

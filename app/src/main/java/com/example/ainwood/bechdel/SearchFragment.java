@@ -57,7 +57,7 @@ public class SearchFragment extends Fragment {
             final String bechdelString = queryString + str;
             ArrayList<MovieInfo> movieInfoArrayList = new ArrayList<MovieInfo>();
             if (workThread == null) {
-                workThread = new QueryThread(getActivity(), adapter, bechdelString);
+                workThread = new QueryThread(getActivity(), adapter, bechdelString, null, 3, 0);
                 workThread.start();
             } else {
                 workThread.setRequestKill(true);
@@ -69,7 +69,7 @@ public class SearchFragment extends Fragment {
                         if (workThread.isAlive()) {
                             myHandler.postDelayed(this, 100);
                         } else {
-                            workThread = new QueryThread(getActivity(), adapter, bechdelString);
+                            workThread = new QueryThread(getActivity(), adapter, bechdelString, null, 3, 0);
                             workThread.start();
                         }
                     }
