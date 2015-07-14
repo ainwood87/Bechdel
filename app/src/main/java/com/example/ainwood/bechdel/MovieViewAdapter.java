@@ -33,6 +33,21 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
         holder.scoreView.setText(Integer.toString(info.getScore()));
         holder.titleView.setText(info.getTitle());
         holder.posterView.setImageBitmap(info.getPoster());
+        int res;
+        switch (info.getScore()) {
+            case 1:
+                res = R.drawable.score1;
+                break;
+            case 2:
+                res= R.drawable.score2;
+                break;
+            case 3:
+                res = R.drawable.score3;
+                break;
+            default:
+                res = R.drawable.score0;
+        }
+        holder.scorePic.setImageResource(res);
     }
 
     @Override
