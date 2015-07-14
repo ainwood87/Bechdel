@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +28,7 @@ import java.net.URLEncoder;
 public class SearchFragment extends Fragment {
     private MovieViewAdapter adapter;
     RecyclerView recList;
+    private RelativeLayout buttonBar;
     private BechdelTask bechdelTask;
     private PosterTask posterTask;
     private String bechdelResponse;
@@ -39,6 +41,7 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_main, null);
         recList = (RecyclerView) view.findViewById(R.id.cardList);
+        buttonBar = (RelativeLayout) view.findViewById(R.id.buttonBar);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
@@ -48,6 +51,7 @@ public class SearchFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onBechdel, new IntentFilter("bechdel"));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onPoster, new IntentFilter("poster"));
         recList.setAdapter(adapter);
+        buttonBar.setVisibility(adapter.getItemCount() > 0 ? View.VISIBLE : View.INVISIBLE);
         return view;
     }
 
@@ -95,6 +99,7 @@ public class SearchFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             String responseString = extras.getString("bechdel");
+            buttonBar.setVisibility(View.VISIBLE);
             bechdelResponse = responseString;
             choosePage(0);
             posterTask = new PosterTask(bechdelResponse, 0, PAGE_SIZE - 1, getActivity());
@@ -127,6 +132,7 @@ public class SearchFragment extends Fragment {
 
     public void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            buttonBar.setVisibility(View.INVISIBLE);
             String query = intent.getStringExtra(SearchManager.QUERY);
             //use the query to search your data somehow
             String str = "";
