@@ -109,10 +109,8 @@ public class PosterTask extends AsyncTask<Void, PosterWrapper, Void> {
                 if (isCancelled()) return null;
                 int index = i - start;
                 PosterWrapper wrapper = new PosterWrapper(poster, index);
-                Intent intent = new Intent("poster");
-                intent.putExtra("poster", poster);
-                intent.putExtra("index", index);
-                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                publishProgress(wrapper);
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -128,5 +126,14 @@ public class PosterTask extends AsyncTask<Void, PosterWrapper, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+    }
+
+    @Override
+    protected void onProgressUpdate(PosterWrapper... values) {
+        super.onProgressUpdate(values);
+        Intent intent = new Intent("poster");
+        intent.putExtra("poster", values[0].getBitmap());
+        intent.putExtra("index", values[0].getIndex());
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }
