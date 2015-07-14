@@ -59,7 +59,6 @@ public class SearchFragment extends Fragment {
     private BroadcastReceiver onBechdel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //TODO fill the adapter, and then start the activity for pictures
             Bundle extras = intent.getExtras();
             String responseString = extras.getString("bechdel");
             int size = 0;
