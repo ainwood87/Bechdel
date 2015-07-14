@@ -30,6 +30,7 @@ public class SearchFragment extends Fragment {
     private BechdelTask bechdelTask;
     private PosterTask posterTask;
     private String bechdelResponse;
+    private int movieCount = 0;
     static final private int PAGE_SIZE = 25;
     private int page = 0;
     @Override
@@ -67,7 +68,7 @@ public class SearchFragment extends Fragment {
             System.out.println("got response: " + bechdelResponse);
             //parse the JSON data
             JSONArray json = new JSONArray(bechdelResponse);
-            size = json.length();
+            movieCount = json.length();
 //                    JSONObject json = new JSONObject(responseString);
             for (int i = PAGE_SIZE * page; i < json.length() && i < PAGE_SIZE * (page + 1); ++i) {
                 JSONObject jsonObject = json.getJSONObject(i);
@@ -100,6 +101,24 @@ public class SearchFragment extends Fragment {
             posterTask.execute();
         }
     };
+    public void onNextPage() {
+        if ((page + 1) * PAGE_SIZE >= movieCount) return;
+        choosePage(page + 1);
+        if (posterTask != null) {
+            posterTask.cancel(true);
+        }
+        posterTask = new PosterTask(bechdelResponse, page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1, getActivity());
+        posterTask.execute();
+    }
+    public void onPrevPage() {
+        if ((page - 1) * PAGE_SIZE < 0) return;
+        choosePage(page - 1);
+        if (posterTask != null) {
+            posterTask.cancel(true);
+        }
+        posterTask = new PosterTask(bechdelResponse, page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1, getActivity());
+        posterTask.execute();
+    }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -124,6 +143,9 @@ public class SearchFragment extends Fragment {
                 posterTask.cancel(true);
             }
             adapter.clearAllData();
+            bechdelResponse = "";
+            movieCount = 0;
+            page = 0;
             bechdelTask = new BechdelTask(getActivity());
             bechdelTask.execute(str);
         }
