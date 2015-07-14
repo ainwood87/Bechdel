@@ -29,6 +29,9 @@ public class SearchFragment extends Fragment {
     RecyclerView recList;
     private BechdelTask bechdelTask;
     private PosterTask posterTask;
+    private String bechdelResponse;
+    static final private int PAGE_SIZE = 25;
+    private int page = 0;
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
@@ -56,38 +59,44 @@ public class SearchFragment extends Fragment {
             adapter.setPoster(index, bitmap);
         }
     };
+    private void choosePage(int page) {
+        this.page = page;
+        int size = 0;
+        adapter.clearAllData();
+        try {
+            System.out.println("got response: " + bechdelResponse);
+            //parse the JSON data
+            JSONArray json = new JSONArray(bechdelResponse);
+            size = json.length();
+//                    JSONObject json = new JSONObject(responseString);
+            for (int i = PAGE_SIZE * page; i < json.length() && i < PAGE_SIZE * (page + 1); ++i) {
+                JSONObject jsonObject = json.getJSONObject(i);
+                MovieInfo info = new MovieInfo();
+                System.out.println("Going to set stuff: ");
+                info.setTitle(jsonObject.getString("title"));
+                System.out.println("Title: " + info.getTitle());
+                String score = jsonObject.getString("rating");
+                String imdbid = jsonObject.getString("imdbid");
+                if (score != "null") {
+                    info.setScore(Integer.parseInt(score));
+                }
+                if (imdbid != "null") {
+                    info.setImdbid(Long.parseLong(imdbid));
+                }
+                adapter.addData(info);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     private BroadcastReceiver onBechdel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             String responseString = extras.getString("bechdel");
-            int size = 0;
-            try {
-                System.out.println("got response: " + responseString);
-                //parse the JSON data
-                JSONArray json = new JSONArray(responseString);
-                size = json.length();
-//                    JSONObject json = new JSONObject(responseString);
-                for (int i = 0; i < json.length(); ++i) {
-                    JSONObject jsonObject = json.getJSONObject(i);
-                    MovieInfo info = new MovieInfo();
-                    System.out.println("Going to set stuff: ");
-                    info.setTitle(jsonObject.getString("title"));
-                    System.out.println("Title: " + info.getTitle());
-                    String score = jsonObject.getString("rating");
-                    String imdbid = jsonObject.getString("imdbid");
-                    if (score != "null") {
-                        info.setScore(Integer.parseInt(score));
-                    }
-                    if (imdbid != "null") {
-                        info.setImdbid(Long.parseLong(imdbid));
-                    }
-                    adapter.addData(info);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            posterTask = new PosterTask(responseString, 0, size - 1, getActivity());
+            bechdelResponse = responseString;
+            choosePage(0);
+            posterTask = new PosterTask(bechdelResponse, 0, PAGE_SIZE - 1, getActivity());
             posterTask.execute();
         }
     };
