@@ -96,7 +96,7 @@ public class PosterTask extends AsyncTask<Void, PosterWrapper, Void> {
             for (int i = start; i < json.length() && i <= end; ++i) {
                 JSONObject jsonObject = json.getJSONObject(i);
                 String imdbid = jsonObject.getString("imdbid");
-                if (imdbid == null) continue;
+                if (imdbid == "null") continue;
 
                 long imdbid_val = Long.parseLong(imdbid);
                 if (isCancelled()) return null;
