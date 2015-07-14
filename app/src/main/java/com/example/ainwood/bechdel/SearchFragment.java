@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -28,6 +29,7 @@ public class SearchFragment extends Fragment {
     private MovieViewAdapter adapter;
     RecyclerView recList;
     private BechdelTask bechdelTask;
+    private PosterTask posterTask;
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
@@ -41,20 +43,32 @@ public class SearchFragment extends Fragment {
             adapter = new MovieViewAdapter();
         }
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onBechdel, new IntentFilter("bechdel"));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onPoster, new IntentFilter("poster"));
         recList.setAdapter(adapter);
         return view;
     }
+
+    private BroadcastReceiver onPoster = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            int index = extras.getInt("index");
+            Bitmap bitmap = (Bitmap) extras.getParcelable("poster");
+            adapter.setPoster(index, bitmap);
+        }
+    };
     private BroadcastReceiver onBechdel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             //TODO fill the adapter, and then start the activity for pictures
             Bundle extras = intent.getExtras();
             String responseString = extras.getString("bechdel");
-
+            int size = 0;
             try {
                 System.out.println("got response: " + responseString);
                 //parse the JSON data
                 JSONArray json = new JSONArray(responseString);
+                size = json.length();
 //                    JSONObject json = new JSONObject(responseString);
                 for (int i = 0; i < json.length(); ++i) {
                     JSONObject jsonObject = json.getJSONObject(i);
@@ -75,6 +89,8 @@ public class SearchFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            posterTask = new PosterTask(responseString, 0, size - 1, getActivity());
+            posterTask.execute();
         }
     };
     @Override

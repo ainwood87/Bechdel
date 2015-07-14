@@ -1,5 +1,6 @@
 package com.example.ainwood.bechdel;
 
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +44,13 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
         movieList.add(info);
         notifyDataSetChanged();
     }
+
+    public void setPoster(int index, Bitmap poster) {
+        MovieInfo info = movieList.get(index);
+        info.setPoster(poster);
+        notifyDataSetChanged();
+    }
+
     public void clearAllData() {
         movieList.clear();
         notifyDataSetChanged();
