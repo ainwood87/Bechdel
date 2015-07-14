@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -109,14 +108,14 @@ public class SearchFragment extends Fragment {
             } catch (Exception e) {
 
             }
-            adapter.clearAllData();
             //clear task if we started it already
             if (bechdelTask != null) {
                 bechdelTask.cancel(true);
-                while (bechdelTask.getStatus() == AsyncTask.Status.RUNNING) {
-                    //polling...should setup a timer task or something, but this should work for now
-                }
             }
+            if (posterTask != null) {
+                posterTask.cancel(true);
+            }
+            adapter.clearAllData();
             bechdelTask = new BechdelTask(getActivity());
             bechdelTask.execute(str);
         }

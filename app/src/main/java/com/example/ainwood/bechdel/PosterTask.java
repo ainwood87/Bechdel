@@ -74,7 +74,7 @@ public class PosterTask extends AsyncTask<Void, PosterWrapper, Void> {
         } catch (IOException e) {
             //TODO Handle problems..
         }
-        System.out.println("imdb response: " + responseString);
+//        System.out.println("imdb response: " + responseString);
         return responseString;
     }
     private Bitmap getPoster(String urldisplay) {
@@ -99,11 +99,14 @@ public class PosterTask extends AsyncTask<Void, PosterWrapper, Void> {
                 if (imdbid == null) continue;
 
                 long imdbid_val = Long.parseLong(imdbid);
+                if (isCancelled()) return null;
                 String imdbresult = getimdbResult(imdbid_val);
                 String posterUrl = getPosterURL(imdbresult);
                 if (posterUrl == "null") continue;
-                
+
+                if (isCancelled()) return null;
                 Bitmap poster = getPoster(posterUrl);
+                if (isCancelled()) return null;
                 int index = i - start;
                 PosterWrapper wrapper = new PosterWrapper(poster, index);
                 Intent intent = new Intent("poster");
