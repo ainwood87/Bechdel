@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -84,6 +85,8 @@ public class SearchFragment extends Fragment {
                 String score = jsonObject.getString("rating");
                 String imdbid = jsonObject.getString("imdbid");
                 String id = jsonObject.getString("id");
+                Bitmap defaultPoster = BitmapFactory.decodeResource(getResources(), R.drawable.poster_unavailable);
+                info.setPoster(defaultPoster);
                 if (score != "null") {
                     info.setScore(Integer.parseInt(score));
                 }
