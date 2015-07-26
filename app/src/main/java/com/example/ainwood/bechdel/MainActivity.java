@@ -21,6 +21,7 @@ public class MainActivity extends ActionBarActivity {
 
     private final Activity activity = this;
     private SearchFragment searchFragment;
+    private SearchView searchView;
     private BroadcastReceiver itemClick = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -53,6 +54,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onNewIntent(Intent intent)
     {
+        searchView.clearFocus();
         searchFragment.handleIntent(intent);
     }
 
@@ -64,7 +66,7 @@ public class MainActivity extends ActionBarActivity {
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
+        searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
         ComponentName name = getComponentName();
         SearchableInfo info = searchManager.getSearchableInfo(name);
