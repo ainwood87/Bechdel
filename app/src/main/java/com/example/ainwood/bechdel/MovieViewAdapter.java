@@ -1,6 +1,11 @@
 package com.example.ainwood.bechdel;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,17 +18,29 @@ import java.util.ArrayList;
  */
 public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
     private ArrayList<MovieInfo> movieList;
+    private Context context;
 
-    public MovieViewAdapter(ArrayList<MovieInfo> list) {
-        movieList = list;
-    }
-    public MovieViewAdapter() {
+
+    public MovieViewAdapter(Context context) {
+        this.context = context;
         movieList = new ArrayList<MovieInfo>();
+        LocalBroadcastManager.getInstance(context).registerReceiver(itemClick, new IntentFilter("itemClick"));
+
     }
+    private BroadcastReceiver itemClick = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int index = intent.getExtras().getInt("index");
+            long bechdelIndex = movieList.get(index).getId();
+            Intent webIntent = new Intent("openPage");
+            webIntent.putExtra("bechdelID", bechdelIndex);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(webIntent);
+        }
+    };
     @Override
     public MovieHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        return new MovieHolder(v);
+        return new MovieHolder(context, v);
     }
 
     @Override

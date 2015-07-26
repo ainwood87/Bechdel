@@ -3,10 +3,14 @@ package com.example.ainwood.bechdel;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -18,6 +22,15 @@ public class MainActivity extends ActionBarActivity {
 
     private final Activity activity = this;
     private SearchFragment searchFragment;
+    private BroadcastReceiver itemClick = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            long id = intent.getExtras().getLong("bechdelID");
+            String url = "http://bechdeltest.com/view/" + id;
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
             getFragmentManager().beginTransaction()
                     .add(android.R.id.content,
                             searchFragment).commit();
+            LocalBroadcastManager.getInstance(this).registerReceiver(itemClick, new IntentFilter("openPage"));
         }
     }
     public void onNextPage(View v) {

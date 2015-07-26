@@ -47,7 +47,7 @@ public class SearchFragment extends Fragment {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recList.setLayoutManager(llm);
         if (adapter == null) {
-            adapter = new MovieViewAdapter();
+            adapter = new MovieViewAdapter(getActivity());
         }
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onBechdel, new IntentFilter("bechdel"));
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onPoster, new IntentFilter("poster"));
@@ -83,11 +83,15 @@ public class SearchFragment extends Fragment {
                 System.out.println("Title: " + info.getTitle());
                 String score = jsonObject.getString("rating");
                 String imdbid = jsonObject.getString("imdbid");
+                String id = jsonObject.getString("id");
                 if (score != "null") {
                     info.setScore(Integer.parseInt(score));
                 }
                 if (imdbid != "null") {
                     info.setImdbid(Long.parseLong(imdbid));
+                }
+                if (id != "null") {
+                    info.setId(Long.parseLong(id));
                 }
                 adapter.addData(info);
             }
@@ -182,4 +186,6 @@ public class SearchFragment extends Fragment {
             bechdelTask.execute(str);
         }
     }
+
+
 }

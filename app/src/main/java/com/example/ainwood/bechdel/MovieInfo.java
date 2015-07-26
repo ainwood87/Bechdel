@@ -47,6 +47,7 @@ public class MovieInfo {
         title = "";
         score = 0;
         year = "";
+        this.id = 0;
     }
     MovieInfo(MovieInfo other) {
         this.imdbid = other.imdbid;
@@ -54,8 +55,19 @@ public class MovieInfo {
         this.score = other.score;
         this.poster = other.poster;
         this.year = other.year;
+        this.id = other.id;
     }
     private long imdbid;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    private long id;
     private String title;
     private int score;
     private Bitmap poster;
