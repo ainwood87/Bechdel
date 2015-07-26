@@ -16,7 +16,6 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -45,12 +44,12 @@ public class MainActivity extends ActionBarActivity {
             LocalBroadcastManager.getInstance(this).registerReceiver(itemClick, new IntentFilter("openPage"));
         }
     }
-    public void onNextPage(View v) {
-        searchFragment.onNextPage();
-    }
-    public void onPrevPage(View v) {
-        searchFragment.onPrevPage();
-    }
+//    public void onNextPage(View v) {
+//        searchFragment.onNextPage();
+//    }
+//    public void onPrevPage(View v) {
+//        searchFragment.onPrevPage();
+//    }
     @Override
     protected void onNewIntent(Intent intent)
     {

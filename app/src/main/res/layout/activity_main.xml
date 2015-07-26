@@ -1,53 +1,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-   tools:context=".MainActivity"
+    tools:context=".MainActivity"
     android:orientation="vertical">
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonBar">
-        <Button
+        android:orientation="vertical"
+        android:id="@+id/resultsMessage"
+        android:layout_gravity="center"
+        >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="@android:color/black"
+        android:text="Found over 25 results."
+        android:layout_centerInParent="true"
+        android:textSize="20sp"
+        />
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Prev"
-            android:onClick="onPrevPage"
-            />
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:textColor="@android:color/black"
+            android:text="Please refine your search."
             android:layout_centerInParent="true"
-            >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Displaying "
-                android:layout_centerInParent="true"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/numResultsView"
-                android:text="25"
-                android:layout_centerInParent="true"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" results"
-                android:layout_centerInParent="true"
-                />
-        </LinearLayout>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Next"
-            android:layout_alignParentRight="true"
-            android:onClick="onNextPage"
+            android:textSize="20sp"
             />
+    </LinearLayout>
 
-    </RelativeLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cardList"
         android:layout_width="match_parent"
