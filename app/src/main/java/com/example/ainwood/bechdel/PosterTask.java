@@ -30,6 +30,7 @@ public class PosterTask extends AsyncTask<Void, PosterWrapper, Void> {
     String bechdelJson;
     int start;
     int end;
+    private static final float POSTER_RATIO = 1.5f;
     Context context;
     PosterTask(String bechdelJson, int start, int end, Context context) {
         this.bechdelJson = bechdelJson;
@@ -128,11 +129,32 @@ public class PosterTask extends AsyncTask<Void, PosterWrapper, Void> {
         super.onPostExecute(aVoid);
     }
 
+    private Bitmap cropBitmap(Bitmap original) {
+        Bitmap cropped;
+        if (original == null) return null;
+        int W = original.getWidth();
+        int H = original.getHeight();
+        if (W > H) return null;
+        if ((float) H / W > POSTER_RATIO) {
+            //poster is too tall! Cut the top and bottom
+            int cut = (H - (int) (POSTER_RATIO * W)) / 2;
+            cropped = Bitmap.createBitmap(original, 0, cut, W, H - 2 * cut);
+        } else if ((float) H / W < POSTER_RATIO) {
+            //poster is too wide! Cut the top and bottom
+            int cut = (W - (int) (H / POSTER_RATIO)) / 2;
+            cropped = Bitmap.createBitmap(original, cut, 0, W - 2 * cut, H);
+        } else {
+            cropped = original;
+        }
+        return cropped;
+    }
+
     @Override
     protected void onProgressUpdate(PosterWrapper... values) {
         super.onProgressUpdate(values);
         Intent intent = new Intent("poster");
-        intent.putExtra("poster", values[0].getBitmap());
+        Bitmap cropped = cropBitmap(values[0].getBitmap());
+        intent.putExtra("poster", cropped);
         intent.putExtra("index", values[0].getIndex());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
