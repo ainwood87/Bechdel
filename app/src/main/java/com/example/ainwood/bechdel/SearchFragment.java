@@ -37,6 +37,7 @@ public class SearchFragment extends Fragment {
     private int movieCount = 0;
     static final private int PAGE_SIZE = 8000;
     private int page = 0;
+    Bitmap defaultPoster;
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
@@ -54,6 +55,7 @@ public class SearchFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onPoster, new IntentFilter("poster"));
         recList.setAdapter(adapter);
         buttonBar.setVisibility(adapter.getItemCount() > 0 ? View.VISIBLE : View.INVISIBLE);
+        defaultPoster = BitmapFactory.decodeResource(getResources(), R.drawable.poster_unavailable);
         return view;
     }
 
@@ -85,7 +87,7 @@ public class SearchFragment extends Fragment {
                 String score = jsonObject.getString("rating");
                 String imdbid = jsonObject.getString("imdbid");
                 String id = jsonObject.getString("id");
-                Bitmap defaultPoster = BitmapFactory.decodeResource(getResources(), R.drawable.poster_unavailable);
+
                 info.setPoster(defaultPoster);
                 if (score != "null") {
                     info.setScore(Integer.parseInt(score));
