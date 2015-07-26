@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,7 +34,7 @@ public class SearchFragment extends Fragment {
     private PosterTask posterTask;
     private String bechdelResponse;
     private int movieCount = 0;
-    static final private int PAGE_SIZE = 25;
+    static final private int PAGE_SIZE = 8000;
     private int page = 0;
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -102,6 +103,14 @@ public class SearchFragment extends Fragment {
             buttonBar.setVisibility(View.VISIBLE);
             bechdelResponse = responseString;
             choosePage(0);
+            try {
+                JSONArray json = new JSONArray(bechdelResponse);
+                int numResults = Math.min(PAGE_SIZE, json.length() - page * PAGE_SIZE);
+                TextView v = (TextView) buttonBar.findViewById(R.id.numResultsView);
+                v.setText(Integer.toString(numResults));
+            } catch (Exception e) {
+
+            }
             posterTask = new PosterTask(bechdelResponse, 0, PAGE_SIZE - 1, getActivity());
             posterTask.execute();
         }
@@ -112,6 +121,14 @@ public class SearchFragment extends Fragment {
         if (posterTask != null) {
             posterTask.cancel(true);
         }
+        try {
+            JSONArray json = new JSONArray(bechdelResponse);
+            int numResults = Math.min(PAGE_SIZE, json.length() - page * PAGE_SIZE);
+            TextView v = (TextView) buttonBar.findViewById(R.id.numResultsView);
+            v.setText(Integer.toString(numResults));
+        } catch (Exception e) {
+
+        }
         posterTask = new PosterTask(bechdelResponse, page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1, getActivity());
         posterTask.execute();
     }
@@ -121,6 +138,15 @@ public class SearchFragment extends Fragment {
         if (posterTask != null) {
             posterTask.cancel(true);
         }
+        try {
+            JSONArray json = new JSONArray(bechdelResponse);
+            int numResults = Math.min(PAGE_SIZE, json.length() - page * PAGE_SIZE);
+            TextView v = (TextView) buttonBar.findViewById(R.id.numResultsView);
+            v.setText(Integer.toString(numResults));
+        } catch (Exception e) {
+
+        }
+
         posterTask = new PosterTask(bechdelResponse, page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1, getActivity());
         posterTask.execute();
     }
