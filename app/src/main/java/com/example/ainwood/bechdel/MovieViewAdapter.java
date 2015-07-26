@@ -48,7 +48,9 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
         MovieInfo info = movieList.get(position);
 //        holder.textView.setText(info.getText());
         holder.scoreView.setText(Integer.toString(info.getScore()));
-        holder.titleView.setText(info.getTitle());
+        String titleString = info.getTitle();
+        titleString += " (" + info.getYear() + ")";
+        holder.titleView.setText(titleString);
         holder.posterView.setImageBitmap(info.getPoster());
         int res;
         switch (info.getScore()) {

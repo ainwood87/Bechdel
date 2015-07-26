@@ -86,6 +86,7 @@ public class SearchFragment extends Fragment {
                 String score = jsonObject.getString("rating");
                 String imdbid = jsonObject.getString("imdbid");
                 String id = jsonObject.getString("id");
+                String year = jsonObject.getString("year");
 
                 info.setPoster(defaultPoster);
                 if (score != "null") {
@@ -96,6 +97,9 @@ public class SearchFragment extends Fragment {
                 }
                 if (id != "null") {
                     info.setId(Long.parseLong(id));
+                }
+                if (year != "null") {
+                    info.setYear(year);
                 }
                 adapter.addData(info);
             }
