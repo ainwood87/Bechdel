@@ -53,16 +53,16 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
         int res;
         switch (info.getScore()) {
             case 1:
-                res = R.drawable.score1;
+                res = R.drawable.star1;
                 break;
             case 2:
-                res= R.drawable.score2;
+                res= R.drawable.star2;
                 break;
             case 3:
-                res = R.drawable.score3;
+                res = R.drawable.star3;
                 break;
             default:
-                res = R.drawable.score0;
+                res = R.drawable.star0;
         }
         holder.scorePic.setImageResource(res);
     }
