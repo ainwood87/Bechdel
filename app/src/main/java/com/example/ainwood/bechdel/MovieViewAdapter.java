@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,7 @@ public class MovieViewAdapter extends RecyclerView.Adapter<MovieHolder> {
         MovieInfo info = movieList.get(position);
 //        holder.textView.setText(info.getText());
         holder.scoreView.setText(Integer.toString(info.getScore()));
-        String titleString = info.getTitle();
+        String titleString = Html.fromHtml(info.getTitle()).toString();
         titleString += " (" + info.getYear() + ")";
         holder.titleView.setText(titleString);
         holder.posterView.setImageBitmap(info.getPoster());
