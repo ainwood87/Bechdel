@@ -1,0 +1,4 @@
+-Display instructions on how to search when the app opens
+-Display something if zero search results
+-Add scrollybar to the list
+-Add spinners to indicate stuff is still loading.
